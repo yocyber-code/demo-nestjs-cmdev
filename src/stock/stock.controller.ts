@@ -9,19 +9,22 @@ import {
   Param,
   Delete,
   Put,
+  HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock-dto';
-import { ChangeStringCasePipe } from 'src/pipe/change-string-case/change-string-case.pipe';
-import { Product } from './product.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ProductRepository } from './product.repository';
+import { StockService } from './stock.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as fsExtra from 'fs-extra';
+import { randomUUID } from 'crypto';
+import { extname } from 'path';
 
 @Controller('stock')
 export class StockController {
-  constructor(
-    @InjectRepository(ProductRepository)
-    private productRepository: ProductRepository,
-  ) {}
+  constructor(private stockService: StockService) {}
+
   @Get('/all')
   async getStocks() {
     // throw new HttpException(
@@ -31,7 +34,10 @@ export class StockController {
     //   },
     //   HttpStatus.FORBIDDEN,
     // );
-    return await this.productRepository.find();
+    const response = await this.stockService.getAllProduct();
+    response.status = HttpStatus.OK;
+    response.message = 'successful';
+    return response;
   }
 
   @Get('/:id')
@@ -57,17 +63,27 @@ export class StockController {
   @Post()
   @HttpCode(200)
   @UsePipes(ValidationPipe)
-  @UsePipes(ChangeStringCasePipe)
-  addStock(@Body() createStrockDto: CreateStockDto) {
-    const { name, price, stock } = createStrockDto;
-    console.log(createStrockDto);
-
-    const product: Product = new Product();
-    product.name = name;
-    product.price = price;
-    product.stock = stock;
-    product.save();
-
-    return { status: 1 };
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, cb) => {
+          const randomName = randomUUID();
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  // @UsePipes(ChangeStringCasePipe)
+  async addStock(
+    @Body() createStockDto: CreateStockDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const fileImage = file.filename;
+    const response = await this.stockService.createProduct(createStockDto,fileImage);
+    response.status = HttpStatus.OK;
+    response.message = 'create successful';
+    // fsExtra.move(file.path, `upload/${response.result[0].id}.${fileExtention}`);
+    return response;
   }
 }

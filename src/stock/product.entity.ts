@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  VersionColumn,
+} from 'typeorm';
 
 @Entity()
 export class Product extends BaseEntity {
@@ -13,4 +21,16 @@ export class Product extends BaseEntity {
 
   @Column()
   stock: number;
+
+  @Column({ default: null })
+  image: string;
+
+  @CreateDateColumn()
+  create: Date;
+
+  @UpdateDateColumn()
+  update: Date;
+
+  @VersionColumn({ default: null })
+  version: number;
 }

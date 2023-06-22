@@ -7,10 +7,10 @@ export class CreateStockDto {
   name: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   price: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   stock: number;
 }
