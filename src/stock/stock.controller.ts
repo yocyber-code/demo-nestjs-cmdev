@@ -12,6 +12,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock-dto';
 import { StockService } from './stock.service';
@@ -40,24 +41,44 @@ export class StockController {
     return response;
   }
 
+  @Get('/keyword')
+  async getStocksByKeyword(@Query('keyword') keyword: string) {
+    const response = await this.stockService.getProductByKeyword(keyword);
+    return response;
+  }
+
   @Get('/:id')
-  getStocksById(@Param('id') id: number) {
-    return id;
+  async getStocksById(@Param('id') id: number) {
+    const resp = await this.stockService.getProductById(id);
+    return resp;
   }
 
   @Delete('/:id')
-  deleteStocksById(@Param('id') id: number) {
-    return id;
+  async deleteStocksById(@Param('id') id: number) {
+    return await this.stockService.deleteProduct(id);
   }
 
   @Put('/:id')
   @UsePipes(ValidationPipe)
-  updateStocksById(
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, cb) => {
+          const randomName = randomUUID();
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async updateStocksById(
     @Param('id') id: number,
     @Body() createStrockDto: CreateStockDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const { name, price, stock } = createStrockDto;
-    return `${name} ${price}, ${stock} id : ${id}`;
+    const fileImage = file.filename;
+    const resp = await this.stockService.updateProduct(id,createStrockDto,fileImage);
+    return resp;
   }
 
   @Post()
@@ -80,7 +101,10 @@ export class StockController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const fileImage = file.filename;
-    const response = await this.stockService.createProduct(createStockDto,fileImage);
+    const response = await this.stockService.createProduct(
+      createStockDto,
+      fileImage,
+    );
     response.status = HttpStatus.OK;
     response.message = 'create successful';
     // fsExtra.move(file.path, `upload/${response.result[0].id}.${fileExtention}`);
