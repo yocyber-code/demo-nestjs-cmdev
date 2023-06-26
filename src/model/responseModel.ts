@@ -3,3 +3,8 @@ export interface ResponseModel {
   message?: string;
   result: any[] | null;
 }
+
+export interface AuthResponseModel {
+  status?: number;
+  token: string;
+}

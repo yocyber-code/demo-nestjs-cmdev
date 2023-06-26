@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock-dto';
 import { StockService } from './stock.service';
@@ -21,13 +22,20 @@ import { diskStorage } from 'multer';
 import * as fsExtra from 'fs-extra';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
+import { ResponseModel } from 'src/model/responseModel';
+import { LoggerInterceptor } from 'src/interceptor/logger/logger.interceptor';
+import { MyGuard } from 'src/guard/my/my.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('stock')
 export class StockController {
   constructor(private stockService: StockService) {}
 
   @Get('/all')
-  async getStocks() {
+  // @UseInterceptors(LoggerInterceptor)
+  // @UseGuards(MyGuard)
+  @UseGuards(AuthGuard())
+  async getStocks(): Promise<ResponseModel> {
     // throw new HttpException(
     //   {
     //     status: HttpStatus.FORBIDDEN,
@@ -42,19 +50,21 @@ export class StockController {
   }
 
   @Get('/keyword')
-  async getStocksByKeyword(@Query('keyword') keyword: string) {
+  async getStocksByKeyword(
+    @Query('keyword') keyword: string,
+  ): Promise<ResponseModel> {
     const response = await this.stockService.getProductByKeyword(keyword);
     return response;
   }
 
   @Get('/:id')
-  async getStocksById(@Param('id') id: number) {
+  async getStocksById(@Param('id') id: number): Promise<ResponseModel> {
     const resp = await this.stockService.getProductById(id);
     return resp;
   }
 
   @Delete('/:id')
-  async deleteStocksById(@Param('id') id: number) {
+  async deleteStocksById(@Param('id') id: number): Promise<ResponseModel> {
     return await this.stockService.deleteProduct(id);
   }
 
@@ -75,9 +85,13 @@ export class StockController {
     @Param('id') id: number,
     @Body() createStrockDto: CreateStockDto,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<ResponseModel> {
     const fileImage = file.filename;
-    const resp = await this.stockService.updateProduct(id,createStrockDto,fileImage);
+    const resp = await this.stockService.updateProduct(
+      id,
+      createStrockDto,
+      fileImage,
+    );
     return resp;
   }
 
@@ -99,7 +113,7 @@ export class StockController {
   async addStock(
     @Body() createStockDto: CreateStockDto,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<ResponseModel> {
     const fileImage = file.filename;
     const response = await this.stockService.createProduct(
       createStockDto,

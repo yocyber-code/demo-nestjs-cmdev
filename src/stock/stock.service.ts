@@ -57,6 +57,8 @@ export class StockService {
       query.where('product.name like :keyword', {keyword: `%${keyword}%`})
       const products = await query.getMany();
       const resp: ResponseModel = { result: products };
+      resp.status = 200;
+      resp.message = 'successful';
       return resp;
     }
     return await this.getAllProduct();

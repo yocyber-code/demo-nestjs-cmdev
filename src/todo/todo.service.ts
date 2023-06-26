@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Todo } from './todo.entity';
 import { randomUUID } from 'crypto';
-import { promises } from 'dns';
 
 @Injectable()
 export class TodoService {
