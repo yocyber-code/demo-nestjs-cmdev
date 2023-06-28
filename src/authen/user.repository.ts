@@ -3,7 +3,7 @@ import { User } from './user.entity';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserCredentialDto } from './dto/createUser-credential.dto copy';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { UserCredentialDto } from './dto/user-credential.dto';
 
 @Injectable()

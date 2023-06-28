@@ -11,15 +11,22 @@ import { loggerFn } from './middleware/logger.fn.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerInterceptor } from './interceptor/logger/logger.interceptor';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import * as config from 'config';
 
+const envConfig = config.get('env');
 @Module({
   imports: [
     AuthenModule,
     TodoModule,
     StockModule,
-    TypeOrmModule.forRoot(typeOrmConfig),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),
+    TypeOrmModule.forRootAsync(typeOrmConfig),
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: envConfig.name,
     }),
   ],
   controllers: [AppController],
