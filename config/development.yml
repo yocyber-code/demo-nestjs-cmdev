@@ -7,4 +7,4 @@ db:
   password: "1324"
 
 env:
-  name: "development.env"
+  name: ".env.development"

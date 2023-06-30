@@ -2,4 +2,4 @@ server:
   port: 5000
 
 env:
-  name: "production.env"
+  name: ".env.production"
