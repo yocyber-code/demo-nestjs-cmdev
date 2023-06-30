@@ -71,7 +71,7 @@ export class StockService {
   ): Promise<ResponseModel> {
     const product = await this.productRepository.findOneBy({ id: id });
     if (product) {
-      fsExtra.remove(`./upload/images/${product.image}`);
+      fsExtra.remove(`./static/upload/images${product.image}`);
       product.name = createStockDto.name;
       product.price = createStockDto.price;
       product.stock = createStockDto.stock;
@@ -88,7 +88,7 @@ export class StockService {
   async deleteProduct(id: number): Promise<any> {
     const product = await this.productRepository.findOneBy({ id: id });
     if (product) {
-      fsExtra.remove(`./upload/images/${product.image}`);
+      fsExtra.remove(`./static/upload/images${product.image}`);
       return await this.productRepository.delete({ id: id });
     }
     throw new BadRequestException(`Product with ID ${id} not found`);

@@ -5,7 +5,7 @@ import * as config from 'config';
 // const dbConfig = config.get('db');
 let ssl = {};
 
-if (config.get('env').name !== 'development.env') {
+if (config.get('env').name !== '.env.development') {
   ssl = {
     ssl: {
       rejectUnauthorized: false,

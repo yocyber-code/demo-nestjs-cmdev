@@ -73,7 +73,7 @@ export class StockController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './upload/images',
+        destination: './static/upload/images',
         filename: (req, file, cb) => {
           const randomName = randomUUID();
           return cb(null, `${randomName}${extname(file.originalname)}`);
@@ -101,7 +101,7 @@ export class StockController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './upload/images',
+        destination: './static/upload/images',
         filename: (req, file, cb) => {
           const randomName = randomUUID();
           return cb(null, `${randomName}${extname(file.originalname)}`);
