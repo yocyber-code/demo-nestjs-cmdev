@@ -1,10 +1,5 @@
 server:
   port: 3000
 
-db:
-  port: 5432
-  username: "postgres"
-  password: "1324"
-
 env:
   name: ".env.development"
